@@ -1,11 +1,59 @@
-alertmanager:
-  persistentVolume:
-    enabled: false
+## Define serviceAccount names for components. Defaults to component's fully qualified name.
+##
+serviceAccounts:
+  server:
+    create: true
+    name: ""
+    annotations: {}
 
 server:
+  name: prometheus-server # Prometheus server container name
   fullnameOverride: prometheus-server
+  nodeSelector:
+    role: system
+  global:
+    scrape_interval: 1m # How frequently to scrape targets by default
+    scrape_timeout: 10s # How long until a scrape request times out
+    evaluation_interval: 1m # How frequently to evaluate rules
   persistentVolume:
-    enabled: false
+    enabled: true
+    existingClaim: ${EFS_CLAIM_OTEL}
+    ## Subdirectory of Prometheus server data Persistent Volume to mount
+    ## Useful if the volume's root directory is not empty
+    subPath: "prometheus"
+  retention: "15d" # Prometheus data retention period (default if not specified is 15 days)
+  service:
+    enabled: true
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "external" # use lbc
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing # only for test    
+    # labels: {}
+    # clusterIP: ""
+    # externalIPs: []
+    # loadBalancerIP: ""
+    # loadBalancerSourceRanges: []
+    servicePort: 80
+    sessionAffinity: None
+    type: LoadBalancer
+    ## Enable gRPC port on service to allow auto discovery with thanos-querier
+    # gRPC:
+      # enabled: false
+      # servicePort: 10901
+      # nodePort: 10901
+    ## If using a statefulSet (statefulSet.enabled=true), configure the
+    ## service to connect to a specific replica to have a consistent view
+    ## of the data.
+    # statefulsetReplica:
+      # enabled: false
+      # replica: 0
+    ## Additional port to define in the Service
+    additionalPorts: []
+    # additionalPorts:
+    # - name: authenticated
+    #   port: 8081
+    #   targetPort: 8081
+
 
 extraScrapeConfigs: |
     - job_name: karpenter
@@ -18,3 +66,25 @@ extraScrapeConfigs: |
       - source_labels: [__meta_kubernetes_endpoint_port_name]
         regex: http-metrics
         action: keep
+
+## alertmanager sub-chart configurable values
+## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager
+alertmanager:
+  ## TODO
+  persistentVolume:
+    enabled: false
+
+
+## kube-state-metrics sub-chart configurable values
+## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics
+# kube-state-metrics:
+
+
+## promtheus-node-exporter sub-chart configurable values
+## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
+# prometheus-node-exporter:
+
+
+## pprometheus-pushgateway sub-chart configurable values
+## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway
+# prometheus-pushgateway:

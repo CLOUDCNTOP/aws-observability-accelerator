@@ -6,6 +6,9 @@ image:
   # sha: ""
   # pullPolicy: IfNotPresent
 
+nodeSelector:
+  role: system
+
 env:
   GF_FEATURE_TOGGLES_ENABLE: flameGraph
   GF_AUTH_ANONYMOUS_ENABLED: true
@@ -50,11 +53,13 @@ dashboardProviders:
 
 dashboards:
   default:
-    capacity-dashboard:
+    karpenter-capacity-dashboard:
       url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
-    performance-dashboard:
+    karpenter-performance-dashboard:
       url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
-
+    karpenter-controller-dashboard:
+      url: https://raw.githubusercontent.com/aws/karpenter/main/website/content/en/preview/getting-started/getting-started-with-karpenter/karpenter-controllers.json
+      
 service:
   enabled: true
   type: LoadBalancer
@@ -87,8 +92,8 @@ persistence:
   # finalizers:
   #   - kubernetes.io/pvc-protection
   # # selectorLabels: {}
-  # ## Sub-directory of the PV to mount. Can be templated.
-  # # subPath: ""
+  ## Sub-directory of the PV to mount. Can be templated.
+  subPath: "grafana"
   ## Name of an existing PVC. Can be templated.
   existingClaim: ${EFS_CLAIM_OTEL}
   # ## Extra labels to apply to a PVC.
