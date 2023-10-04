@@ -30,14 +30,14 @@ datasources:
       version: 1
       url: http://prometheus-server:80
       access: proxy
-   - name: Pyroscope
-     type: grafana-pyroscope-datasource
-     editable: true
-     version: 1
-     uid: pyroscope
-     url: http://pyroscope:4040
-    #  url: http://pyroscope-querier.pyroscope-test.svc.cluster.local.:4040/      
-
+    - name: Pyroscope
+      type: grafana-pyroscope-datasource
+      editable: true
+      version: 1
+      uid: pyroscope
+      url: http://pyroscope:4040
+      #  url: http://pyroscope-querier.pyroscope-test.svc.cluster.local.:4040/    
+   
 dashboardProviders:
   dashboardproviders.yaml:
     apiVersion: 1
