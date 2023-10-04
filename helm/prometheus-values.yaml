@@ -70,9 +70,12 @@ extraScrapeConfigs: |
 ## alertmanager sub-chart configurable values
 ## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager
 alertmanager:
-  ## TODO
-  persistentVolume:
-    enabled: false
+  ## TODO phone alarm
+  enabled: true
+  persistence:
+    size: 2Gi  
+  # persistentVolume:
+  #   enabled: false
 
 
 ## kube-state-metrics sub-chart configurable values
