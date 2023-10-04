@@ -1,3 +1,23 @@
+image:
+  # repository: docker.io/grafana/grafana
+  repository: grafana/grafana
+  # Overrides the Grafana image tag whose default is the chart appVersion
+  tag: "main"
+  # sha: ""
+  # pullPolicy: IfNotPresent
+
+env:
+  GF_FEATURE_TOGGLES_ENABLE: flameGraph
+  GF_AUTH_ANONYMOUS_ENABLED: true
+  GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+  GF_DIAGNOSTICS_PROFILING_ENABLED: true
+  GF_DIAGNOSTICS_PROFILING_ADDR: 0.0.0.0
+  GF_DIAGNOSTICS_PROFILING_PORT: 6060
+
+podAnnotations:
+  pyroscope.grafana.com/scrape: true
+  pyroscope.grafana.com/port: 6060
+
 datasources:
   datasources.yaml:
     apiVersion: 1
@@ -7,6 +27,14 @@ datasources:
       version: 1
       url: http://prometheus-server:80
       access: proxy
+   - name: Pyroscope
+     type: grafana-pyroscope-datasource
+     editable: true
+     version: 1
+     uid: pyroscope
+     url: http://pyroscope:4040
+    #  url: http://pyroscope-querier.pyroscope-test.svc.cluster.local.:4040/      
+
 dashboardProviders:
   dashboardproviders.yaml:
     apiVersion: 1
@@ -19,12 +47,14 @@ dashboardProviders:
       editable: true
       options:
         path: /var/lib/grafana/dashboards/default
+
 dashboards:
   default:
     capacity-dashboard:
       url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
     performance-dashboard:
       url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
+
 service:
   enabled: true
   type: LoadBalancer
@@ -37,9 +67,29 @@ service:
   labels: {}
   portName: service
   appProtocol: ""
+
 serviceAccount:
   create: false
   name: otel-admin-sa
+
 grafana.ini:
   auth:
     sigv4_auth_enabled: true
+
+persistence:
+  type: pvc
+  enabled: true
+  storageClassName: efs
+  # accessModes:
+  #   - ReadWriteOnce
+  # size: 10Gi
+  # # annotations: {}
+  # finalizers:
+  #   - kubernetes.io/pvc-protection
+  # # selectorLabels: {}
+  # ## Sub-directory of the PV to mount. Can be templated.
+  # # subPath: ""
+  ## Name of an existing PVC. Can be templated.
+  existingClaim: ${EFS_CLAIM_OTEL}
+  # ## Extra labels to apply to a PVC.
+  # extraPvcLabels: {}
