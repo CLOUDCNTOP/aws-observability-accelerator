@@ -18,8 +18,8 @@ env:
   GF_DIAGNOSTICS_PROFILING_PORT: 6060
 
 podAnnotations:
-  pyroscope.grafana.com/scrape: true
-  pyroscope.grafana.com/port: 6060
+  pyroscope.grafana.com/scrape: "true"
+  pyroscope.grafana.com/port: "6060"
 
 datasources:
   datasources.yaml:
@@ -37,28 +37,61 @@ datasources:
       uid: pyroscope
       url: http://pyroscope:4040
       #  url: http://pyroscope-querier.pyroscope-test.svc.cluster.local.:4040/    
-   
+
 dashboardProviders:
   dashboardproviders.yaml:
     apiVersion: 1
     providers:
-    - name: 'default'
+    # - name: 'default'
+    #   orgId: 1
+    #   folder: ''
+    #   type: file
+    #   disableDeletion: false
+    #   editable: true
+    #   options:
+    #     path: /var/lib/grafana/dashboards/default
+    - name: 'infrastructure'
       orgId: 1
-      folder: ''
+      folder: 'infra'
       type: file
       disableDeletion: false
       editable: true
       options:
-        path: /var/lib/grafana/dashboards/default
+        path: /var/lib/grafana/dashboards/infrastructure    
+    - name: 'application'
+      orgId: 1
+      folder: 'application'
+      type: file
+      disableDeletion: false
+      editable: true
+      # updateIntervalSeconds: 30
+      options:
+        path: /var/lib/grafana/dashboards/application
+    - name: 'karpenter'
+      orgId: 1
+      folder: 'karpenter'
+      type: file
+      disableDeletion: false
+      editable: true
+      # updateIntervalSeconds: 30
+      options:
+        path: /var/lib/grafana/dashboards/karpenter        
+
+## https://github.com/aws/karpenter/tree/main/website/content/en/preview/getting-started/getting-started-with-karpenter   
 
 dashboards:
-  default:
-    karpenter-capacity-dashboard:
+  infrastructure:
+    cluster-dashboard:
+      url: https://github.com/TipTopBin/aws-observability-accelerator/blob/main/artifacts/grafana-dashboards/eks/infrastructure/r_cluster.json
+    nodes-dashboard:
+      url: https://github.com/TipTopBin/aws-observability-accelerator/blob/main/artifacts/grafana-dashboards/eks/infrastructure/r_nodes.json
+  karpenter:
+    capacity-dashboard:
       url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
-    karpenter-performance-dashboard:
+    performance-dashboard:
       url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
-    karpenter-controller-dashboard:
-      url: https://raw.githubusercontent.com/aws/karpenter/main/website/content/en/preview/getting-started/getting-started-with-karpenter/karpenter-controllers.json
+    controller-dashboard:
+      url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-controllers.json
       
 service:
   enabled: true
@@ -93,7 +126,7 @@ persistence:
   #   - kubernetes.io/pvc-protection
   # # selectorLabels: {}
   ## Sub-directory of the PV to mount. Can be templated.
-  subPath: "grafana"
+  subPath: "otel/grafana"
   ## Name of an existing PVC. Can be templated.
   existingClaim: ${EFS_CLAIM_OTEL}
   # ## Extra labels to apply to a PVC.

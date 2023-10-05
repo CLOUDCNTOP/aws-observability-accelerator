@@ -20,10 +20,11 @@ server:
     existingClaim: ${EFS_CLAIM_OTEL}
     ## Subdirectory of Prometheus server data Persistent Volume to mount
     ## Useful if the volume's root directory is not empty
-    subPath: "prometheus"
+    subPath: "otel/prometheus"
   retention: "15d" # Prometheus data retention period (default if not specified is 15 days)
   service:
     enabled: true
+    type: LoadBalancer
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-type: "external" # use lbc
       service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
@@ -33,9 +34,8 @@ server:
     # externalIPs: []
     # loadBalancerIP: ""
     # loadBalancerSourceRanges: []
-    servicePort: 80
-    sessionAffinity: None
-    type: LoadBalancer
+    # servicePort: 80
+    # sessionAffinity: None
     ## Enable gRPC port on service to allow auto discovery with thanos-querier
     # gRPC:
       # enabled: false
@@ -48,7 +48,7 @@ server:
       # enabled: false
       # replica: 0
     ## Additional port to define in the Service
-    additionalPorts: []
+    # additionalPorts: []
     # additionalPorts:
     # - name: authenticated
     #   port: 8081

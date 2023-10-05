@@ -1,4 +1,7 @@
 # Pyroscope eBPF agent 以 daemonset 的方式部署在每一个 EKS 节点上，使用 Kubernetes 的服务发现机制获取 Pod 列表，通过配置规则对采集的数据执行 relabel
+# https://grafana.com/docs/pyroscope/latest/configure-client/grafana-agent/ebpf/
+# https://grafana.com/docs/agent/latest/flow/reference/components/discovery.kubernetes/
+#           url = "http://pyroscope.otel.svc.cluster.local:4040"
 agent:
   mode: 'flow'
   configMap:
@@ -27,7 +30,7 @@ agent:
       }
       pyroscope.write "endpoint" {
         endpoint {
-          url = "http://pyroscope.otel.svc.cluster.local:4040"
+          url = "http://pyroscope:4040"
         }
       }
 
@@ -38,3 +41,10 @@ agent:
 
 controller:
   hostPID: true
+
+## https://hub.docker.com/r/grafana/agent
+image:
+  registry: "docker.io"
+  repository: grafana/agent
+  tag: v0.36.1 # v0.36.2
+
