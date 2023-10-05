@@ -42,34 +42,34 @@ dashboardProviders:
   dashboardproviders.yaml:
     apiVersion: 1
     providers:
-    # - name: 'default'
-    #   orgId: 1
-    #   folder: ''
-    #   type: file
-    #   disableDeletion: false
-    #   editable: true
-    #   options:
-    #     path: /var/lib/grafana/dashboards/default
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /var/lib/grafana/dashboards/default
     - name: 'infrastructure'
       orgId: 1
-      folder: 'infra'
+      folder: 'Infrastructure'
       type: file
       disableDeletion: false
       editable: true
       options:
         path: /var/lib/grafana/dashboards/infrastructure    
-    - name: 'application'
-      orgId: 1
-      folder: 'application'
-      type: file
-      disableDeletion: false
-      editable: true
-      # updateIntervalSeconds: 30
-      options:
-        path: /var/lib/grafana/dashboards/application
+    # - name: 'application'
+    #   orgId: 1
+    #   folder: 'application'
+    #   type: file
+    #   disableDeletion: false
+    #   editable: true
+    #   # updateIntervalSeconds: 30
+    #   options:
+    #     path: /var/lib/grafana/dashboards/application
     - name: 'karpenter'
       orgId: 1
-      folder: 'karpenter'
+      folder: 'Karpenter'
       type: file
       disableDeletion: false
       editable: true
@@ -80,11 +80,14 @@ dashboardProviders:
 ## https://github.com/aws/karpenter/tree/main/website/content/en/preview/getting-started/getting-started-with-karpenter   
 
 dashboards:
+  default:
+    workloads-dashboard:
+      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/infrastructure/r_workloads.json
   infrastructure:
     cluster-dashboard:
-      url: https://github.com/TipTopBin/aws-observability-accelerator/blob/main/artifacts/grafana-dashboards/eks/infrastructure/r_cluster.json
+      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/infrastructure/r_cluster.json
     nodes-dashboard:
-      url: https://github.com/TipTopBin/aws-observability-accelerator/blob/main/artifacts/grafana-dashboards/eks/infrastructure/r_nodes.json
+      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/infrastructure/r_nodes.json
   karpenter:
     capacity-dashboard:
       url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
