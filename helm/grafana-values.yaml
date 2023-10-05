@@ -27,9 +27,13 @@ datasources:
     datasources:
     - name: Prometheus
       type: prometheus
+      uid: prometheus
       version: 1
       url: http://prometheus-server:80
       access: proxy
+      # basicAuth: false
+      isDefault: true
+      editable: true
     - name: Pyroscope
       type: grafana-pyroscope-datasource
       editable: true
@@ -37,6 +41,12 @@ datasources:
       uid: pyroscope
       url: http://pyroscope:4040
       #  url: http://pyroscope-querier.pyroscope-test.svc.cluster.local.:4040/    
+    - name: Alertmanager
+      type: alertmanager
+      uid: alertmanager
+      version: 1
+      url: http://prometheus-alertmanager:9093
+      access: proxy
 
 dashboardProviders:
   dashboardproviders.yaml:
@@ -50,14 +60,14 @@ dashboardProviders:
       editable: true
       options:
         path: /var/lib/grafana/dashboards/default
-    - name: 'infrastructure'
+    - name: 'system'
       orgId: 1
-      folder: 'Infrastructure'
+      folder: 'System'
       type: file
       disableDeletion: false
       editable: true
       options:
-        path: /var/lib/grafana/dashboards/infrastructure    
+        path: /var/lib/grafana/dashboards/system    
     # - name: 'application'
     #   orgId: 1
     #   folder: 'application'
@@ -81,13 +91,13 @@ dashboardProviders:
 
 dashboards:
   default:
-    workloads-dashboard:
-      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/infrastructure/r_workloads.json
-  infrastructure:
+    workload-dashboard:
+      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/dashboards/compute/k8s-workload.json
+  system:
     cluster-dashboard:
-      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/infrastructure/r_cluster.json
+      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/dashboards/compute/k8s-cluster.json
     nodes-dashboard:
-      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/artifacts/grafana-dashboards/eks/infrastructure/r_nodes.json
+      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/dashboards/compute/k8s-node.json
   karpenter:
     capacity-dashboard:
       url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
