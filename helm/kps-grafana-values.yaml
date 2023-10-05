@@ -1,0 +1,146 @@
+image:
+  # repository: docker.io/grafana/grafana
+  repository: grafana/grafana
+  # Overrides the Grafana image tag whose default is the chart appVersion
+  tag: "main"
+  # sha: ""
+  # pullPolicy: IfNotPresent
+
+nodeSelector:
+  role: system
+
+env:
+  GF_FEATURE_TOGGLES_ENABLE: flameGraph
+  GF_AUTH_ANONYMOUS_ENABLED: true
+  GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+  GF_DIAGNOSTICS_PROFILING_ENABLED: true
+  GF_DIAGNOSTICS_PROFILING_ADDR: 0.0.0.0
+  GF_DIAGNOSTICS_PROFILING_PORT: 6060
+
+podAnnotations:
+  pyroscope.grafana.com/scrape: "true"
+  pyroscope.grafana.com/port: "6060"
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      uid: prometheus
+      version: 1
+      url: http://kps-prometheus:9090
+      access: proxy
+      # basicAuth: false
+      isDefault: true
+      editable: true
+    - name: Pyroscope
+      type: grafana-pyroscope-datasource
+      editable: true
+      version: 1
+      uid: pyroscope
+      url: http://pyroscope:4040
+      #  url: http://pyroscope-querier.pyroscope-test.svc.cluster.local.:4040/    
+    - name: Alertmanager
+      type: alertmanager
+      uid: alertmanager
+      version: 1
+      url: http://kps-alertmanager:9093
+      access: proxy
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /var/lib/grafana/dashboards/default
+    - name: 'system'
+      orgId: 1
+      folder: 'System'
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /var/lib/grafana/dashboards/system    
+    # - name: 'application'
+    #   orgId: 1
+    #   folder: 'application'
+    #   type: file
+    #   disableDeletion: false
+    #   editable: true
+    #   # updateIntervalSeconds: 30
+    #   options:
+    #     path: /var/lib/grafana/dashboards/application
+    - name: 'karpenter'
+      orgId: 1
+      folder: 'Karpenter'
+      type: file
+      disableDeletion: false
+      editable: true
+      # updateIntervalSeconds: 30
+      options:
+        path: /var/lib/grafana/dashboards/karpenter        
+
+## https://github.com/aws/karpenter/tree/main/website/content/en/preview/getting-started/getting-started-with-karpenter   
+
+dashboards:
+  default:
+    workload-dashboard:
+      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/dashboards/compute/k8s-workload.json
+  system:
+    cluster-dashboard:
+      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/dashboards/compute/k8s-cluster.json
+    nodes-dashboard:
+      url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/dashboards/compute/k8s-node.json
+  karpenter:
+    capacity-dashboard:
+      url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
+    performance-dashboard:
+      url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
+    controller-dashboard:
+      url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-controllers.json
+      
+service:
+  enabled: true
+  type: LoadBalancer
+  port: 80
+  targetPort: 3000
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "external" # use lbc
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing # only for test
+  labels: {}
+  portName: service
+  appProtocol: ""
+
+serviceAccount:
+  create: false
+  name: otel-admin-sa
+
+grafana.ini:
+  auth:
+    sigv4_auth_enabled: true
+
+persistence:
+  type: pvc
+  enabled: true
+  storageClassName: efs
+  # accessModes:
+  #   - ReadWriteOnce
+  # size: 10Gi
+  # # annotations: {}
+  # finalizers:
+  #   - kubernetes.io/pvc-protection
+  # # selectorLabels: {}
+  ## Sub-directory of the PV to mount. Can be templated.
+  subPath: "otel/grafana"
+  ## Name of an existing PVC. Can be templated.
+  existingClaim: ${EFS_CLAIM_OTEL}
+  # ## Extra labels to apply to a PVC.
+  # extraPvcLabels: {}
