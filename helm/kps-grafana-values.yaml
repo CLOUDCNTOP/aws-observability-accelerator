@@ -1,4 +1,5 @@
 image:
+  # https://hub.docker.com/r/grafana/grafana/tags
   tag: "10.1.2" #  "docker.io/grafana/grafana:10.1.2"
 
 adminPassword: ${GRAFANA_PASSWORD}
@@ -8,8 +9,8 @@ nodeSelector:
 
 env:
   GF_FEATURE_TOGGLES_ENABLE: flameGraph
-  GF_AUTH_ANONYMOUS_ENABLED: true
-  GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+  # GF_AUTH_ANONYMOUS_ENABLED: true
+  # GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
   GF_DIAGNOSTICS_PROFILING_ENABLED: true
   GF_DIAGNOSTICS_PROFILING_ADDR: 0.0.0.0
   GF_DIAGNOSTICS_PROFILING_PORT: 6060
