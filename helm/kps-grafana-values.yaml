@@ -1,10 +1,7 @@
 image:
-  # repository: docker.io/grafana/grafana
-  repository: grafana/grafana
-  # Overrides the Grafana image tag whose default is the chart appVersion
-  tag: "main"
-  # sha: ""
-  # pullPolicy: IfNotPresent
+  tag: "10.1.2" #  "docker.io/grafana/grafana:10.1.2"
+
+adminPassword: ${GRAFANA_PASSWORD}
 
 nodeSelector:
   role: system
@@ -40,7 +37,6 @@ datasources:
       version: 1
       uid: pyroscope
       url: http://pyroscope:4040
-      #  url: http://pyroscope-querier.pyroscope-test.svc.cluster.local.:4040/    
     - name: Alertmanager
       type: alertmanager
       uid: alertmanager
@@ -77,18 +73,9 @@ dashboardProviders:
     #   # updateIntervalSeconds: 30
     #   options:
     #     path: /var/lib/grafana/dashboards/application
-    - name: 'karpenter'
-      orgId: 1
-      folder: 'Karpenter'
-      type: file
-      disableDeletion: false
-      editable: true
-      # updateIntervalSeconds: 30
-      options:
-        path: /var/lib/grafana/dashboards/karpenter        
+  
 
 ## https://github.com/aws/karpenter/tree/main/website/content/en/preview/getting-started/getting-started-with-karpenter   
-
 dashboards:
   default:
     workload-dashboard:
@@ -98,14 +85,7 @@ dashboards:
       url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/dashboards/compute/k8s-cluster.json
     nodes-dashboard:
       url: https://raw.githubusercontent.com/TipTopBin/aws-observability-accelerator/main/dashboards/compute/k8s-node.json
-  karpenter:
-    capacity-dashboard:
-      url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
-    performance-dashboard:
-      url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
-    controller-dashboard:
-      url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-controllers.json
-      
+
 service:
   enabled: true
   type: LoadBalancer
@@ -130,17 +110,7 @@ grafana.ini:
 persistence:
   type: pvc
   enabled: true
-  storageClassName: efs
-  # accessModes:
-  #   - ReadWriteOnce
-  # size: 10Gi
-  # # annotations: {}
-  # finalizers:
-  #   - kubernetes.io/pvc-protection
-  # # selectorLabels: {}
   ## Sub-directory of the PV to mount. Can be templated.
   subPath: "otel/grafana"
   ## Name of an existing PVC. Can be templated.
   existingClaim: ${EFS_CLAIM_OTEL}
-  # ## Extra labels to apply to a PVC.
-  # extraPvcLabels: {}

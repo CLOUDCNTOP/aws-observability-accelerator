@@ -2,7 +2,7 @@ image:
   # repository: docker.io/grafana/grafana
   repository: grafana/grafana
   # Overrides the Grafana image tag whose default is the chart appVersion
-  tag: "main"
+  tag: "main" # 配合 pyroscope
   # sha: ""
   # pullPolicy: IfNotPresent
 

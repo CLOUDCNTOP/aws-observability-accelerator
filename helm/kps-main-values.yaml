@@ -8,11 +8,7 @@ fullnameOverride: kps
 prometheus:
   service:
     enabled: true
-    type: LoadBalancer # NodePort, ClusterIP
-    annotations:
-      service.beta.kubernetes.io/aws-load-balancer-type: "external" # use lbc
-      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing # only for test    
+    type: NodePort
   prometheusSpec:
     nodeSelector:
       role: system
@@ -49,9 +45,6 @@ prometheus:
     ## to break upgrades of Prometheus. It is advised to review Prometheus release notes to ensure that no incompatible
     ## scrape configs are going to break Prometheus after the upgrade.
     ## AdditionalScrapeConfigs can be defined as a list or as a templated string.
-    ##
-    ## The scrape configuration example below will find master nodes, provided they have the name .*mst.*, relabel the
-    ## port to 2379 and allow etcd scraping provided it is running on all Kubernetes master nodes
     additionalScrapeConfigs: |
       - job_name: karpenter
         kubernetes_sd_configs:
