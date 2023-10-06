@@ -6,6 +6,7 @@ pyroscope:
     repository: grafana/pyroscope
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
+    # https://hub.docker.com/r/grafana/pyroscope/tags
     tag: "1.0.0"
 
   extraArgs:
@@ -148,6 +149,7 @@ pyroscope:
   # -- Contains Phlare's configuration as a string.
   # @default -- The config depends on other values been set, details can be found in [`values.yaml`](./values.yaml)
   # 在配置了对象存储的情况下，完整的数据块将被 upload 到 S3上进行持久化
+  # 注意 1.0.0 还不支持跨区域的 S3 桶，需要指定同一区域的桶
   config: |
     storage:
       backend: s3

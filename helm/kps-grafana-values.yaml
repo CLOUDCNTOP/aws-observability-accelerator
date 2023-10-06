@@ -2,7 +2,7 @@ image:
   # https://hub.docker.com/r/grafana/grafana/tags
   tag: "10.1.2" #  "docker.io/grafana/grafana:10.1.2"
 
-adminPassword: ${GRAFANA_PASSWORD}
+adminPassword: ${GRAFANA_PASSWORD} # 注意，启用PV存储后，修改密码需要同步修改持久化存储
 
 nodeSelector:
   role: system
