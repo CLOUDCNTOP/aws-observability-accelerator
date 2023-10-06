@@ -1,3 +1,4 @@
+# https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 image:
   # repository: docker.io/grafana/grafana
   repository: grafana/grafana

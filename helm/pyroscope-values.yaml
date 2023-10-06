@@ -1,4 +1,5 @@
 # https://aws.amazon.com/cn/blogs/china/continuous-profiling-of-eks-container-services-to-diagnose-application-performance-with-pyroscope/
+# https://grafana.com/docs/grafana/latest/datasources/grafana-pyroscope/
 pyroscope:
   replicaCount: 3
 
