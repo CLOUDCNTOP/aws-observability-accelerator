@@ -131,4 +131,4 @@ deploy/
 test/
 **/.DS_Store
 cdk.out/
-helm/ref_*
+**/ref_*

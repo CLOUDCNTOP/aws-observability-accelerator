@@ -83,6 +83,7 @@ prometheus:
     # httpNodePort: 30902
 
   prometheusSpec:
+    replicas: 1
     nodeSelector:
       role: system
     scrapeInterval: "30s" # Defaults to 30s
@@ -105,6 +106,16 @@ prometheus:
           resources:
             requests:
               storage: 50Gi # 联动 retention 的配置，合理设置大小
+          # storageClassName: "efs" # 动态挂载
+          # accessModes: ["ReadWriteMany"]
+          # resources:
+          #   requests:
+          #     storage: 10Gi
+    # Additional volumes on the output StatefulSet definition.
+    volumes: []
+    # Additional VolumeMounts on the output StatefulSet definition.
+    volumeMounts: []
+
     ## EnableAdminAPI enables Prometheus the administrative HTTP API which includes functionality such as deleting time series.
     ## This is disabled by default.
     ## ref: https://prometheus.io/docs/prometheus/latest/querying/api/#tsdb-admin-apis

@@ -19,6 +19,7 @@ podAnnotations:
   pyroscope.grafana.com/scrape: "true"
   pyroscope.grafana.com/port: "6060"
 
+# https://github.com/grafana/grafana/blob/main/devenv/datasources.yaml
 datasources:
   datasources.yaml:
     apiVersion: 1
@@ -32,6 +33,17 @@ datasources:
       # basicAuth: false
       isDefault: true
       editable: true
+    - name: Thanos
+      type: prometheus
+      uid: prometheus
+      version: 1
+      url: http://thanos-query:9090
+      access: proxy
+      isDefault: false
+      editable: true
+      jsonData:
+        prometheusType: "Thanos"
+        prometheusVersion: "0.31.1" 
     - name: Pyroscope
       type: grafana-pyroscope-datasource
       editable: true
