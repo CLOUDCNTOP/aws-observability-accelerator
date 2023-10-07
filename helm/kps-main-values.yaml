@@ -119,12 +119,13 @@ prometheus:
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#thanosspec
     ## 注意 kube-prometheus-stack 里的 thanos 还是实验状态
     ## 启用 Thanos sidecar，将 Prometheus 的指标数据上传到长期存储 S3，并允许 Thanos 查询 Prometheus 的最新指标数据
+    ## https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/thanos.md
     thanos:
       image: quay.io/thanos/thanos:v0.32.2
-      version: "v0.32.2"
-      # objectStorageConfig:
-      #   name: "thanos-objstore-config"
-      #   key: "s3-bucket.yaml"
+      # version: "v0.32.2"
+      objectStorageConfig: # 需要提前创建 secret `kps-thanos-objstore`
+        name: "kps-thanos-objstore"
+        key: "thanos.yaml"
       # objectStorageConfigFile: /var/secrets/object-store.yaml
 
     additionalScrapeConfigs: |
