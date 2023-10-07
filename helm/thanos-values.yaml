@@ -20,7 +20,7 @@ serviceAccount:
 ## existingObjstoreSecret / objstoreConfig 二选一
 ## @param objstoreConfig The [objstore configuration](https://thanos.io/tip/thanos/storage.md/)
 ## Specify content for objstore.yml
-objstoreConfig:
+objstoreConfig: |
   type: S3
   config:
     bucket: ${IA_S3_BUCKET}
@@ -34,7 +34,7 @@ objstoreConfig:
 
 query:
   enabled: true
-  replicas: 2
+  replicaCount: 2
   ## Dynamically configure store APIs using DNS discovery
   ## @param query.dnsDiscovery.enabled Enable store APIs discovery via DNS
   ## @param query.dnsDiscovery.sidecarsService Sidecars service name to discover them using DNS discovery
@@ -73,7 +73,7 @@ compactor:
 
 storegateway:
   enabled: true
-  replicas: 2
+  # replicaCount: 2 # 如果启用会是 2*3=6 个 Pod
   ## Sharded parameters
   ## @param storegateway.sharded.enabled Enable sharding for Thanos Store Gateway
   ## @param storegateway.sharded.hashPartitioning.shards Setting hashPartitioning will create multiple store statefulsets based on the number of shards specified using the hashmod of the blocks
