@@ -124,7 +124,7 @@ prometheus:
       image: quay.io/thanos/thanos:v0.32.2
       # version: "v0.32.2"
       objectStorageConfig: # 需要提前创建 secret `kps-thanos-objstore`
-        name: "kps-thanos-objstore"
+        name: "thanos-objstore-secret"
         key: "thanos.yaml"
       # objectStorageConfigFile: /var/secrets/object-store.yaml
 

@@ -1,0 +1,137 @@
+# https://github.com/bitnami/charts/tree/main/bitnami/thanos
+
+## Common Service Account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+## @param serviceAccount.name Name of the service account to use. If not set and create is true, a name is generated using the fullname template.
+## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+## @param serviceAccount.annotations Annotations for service account. Evaluated as a template. Only used if `create` is `true`.
+serviceAccount:
+  create: false
+  name: otel-admin-sa
+
+## @param existingObjstoreSecret Secret with Objstore Configuration
+## Note: This will override objstoreConfig
+# existingObjstoreSecret: thanos-objstore-secret
+# ## @param existingObjstoreSecretItems Optional item list for specifying a custom Secret key. If so, path should be objstore.yml
+# existingObjstoreSecretItems:
+#   - path: objstore.yml
+#     key: thanos.yaml
+## existingObjstoreSecret / objstoreConfig 二选一
+## @param objstoreConfig The [objstore configuration](https://thanos.io/tip/thanos/storage.md/)
+## Specify content for objstore.yml
+objstoreConfig:
+  type: S3
+  config:
+    bucket: ${IA_S3_BUCKET}
+    endpoint: s3.${AWS_REGION}.amazonaws.com
+    access_key: ${IA_AK}
+    secret_key: ${IA_SK} 
+    # sts_endpoint: sts.amazonaws.com
+    # aws_sdk_auth: true
+  prefix: "thanos"
+
+
+query:
+  enabled: true
+  replicas: 2
+  ## Dynamically configure store APIs using DNS discovery
+  ## @param query.dnsDiscovery.enabled Enable store APIs discovery via DNS
+  ## @param query.dnsDiscovery.sidecarsService Sidecars service name to discover them using DNS discovery
+  ## @param query.dnsDiscovery.sidecarsNamespace Sidecars namespace to discover them using DNS discovery
+  dnsDiscovery: # works for Prometheus sidecar service deployed in the same cluster
+    enabled: true
+    sidecarsService: kps-thanos-discovery
+    sidecarsNamespace: otel
+  ## To connect to different cluster sidecar use either a hostname/IP that is reachable from this cluster
+  extraFlags:
+    # - --endpoint=${EKS_CLUSTER_PROM_EP_1} # EKS cluster 1 prometheus
+    # - --endpoint=10.X.Y.Z:10901 # EKS cluster 2 prometheus
+  # serviceAccount:
+    # annotations:
+    #   eks.amazonaws.com/role-arn: arn:aws:iam::xxx:role/ThanosS3Access
+
+queryFrontend:
+  enabled: true
+
+bucketweb:
+  enabled: false # 调试的时候可以考虑打开
+
+## downsample the Prometheus chunks in S3
+## delete the chunks older than retention specified and run compaction
+compactor:
+  enabled: true
+  retentionResolutionRaw: 30d
+  retentionResolution5m: 90d
+  retentionResolution1h: 180d # 默认10y，根据需要调整
+  ## @param compactor.consistencyDelay Minimum age of fresh (non-compacted) blocks before they are being processed
+  consistencyDelay: 30m
+  # serviceAccount:
+  #   annotations:
+  #     eks.amazonaws.com/role-arn: arn:aws:iam::xxx:role/ThanosS3Access
+
+
+storegateway:
+  enabled: true
+  replicas: 2
+  ## Sharded parameters
+  ## @param storegateway.sharded.enabled Enable sharding for Thanos Store Gateway
+  ## @param storegateway.sharded.hashPartitioning.shards Setting hashPartitioning will create multiple store statefulsets based on the number of shards specified using the hashmod of the blocks
+  ## @param storegateway.sharded.timePartitioning [array] Setting time timePartitioning will create multiple store deployments based on the number of partitions
+  ## @param storegateway.sharded.service.clusterIPs Array of cluster IPs for each Store Gateway service. Length must be the same as the number of shards
+  ## e.g:
+  ## clusterIPs:
+  ##   - X.X.X.X
+  ##   - Y.Y.Y.Y
+  ## @param storegateway.sharded.service.loadBalancerIPs Array of load balancer IPs for each Store Gateway service. Length must be the same as the number of shards
+  ## e.g:
+  ## loadBalancerIPs:
+  ##   - X.X.X.X
+  ##   - Y.Y.Y.Y
+  ## @param storegateway.sharded.service.http.nodePorts Array of http node ports used for Store Gateway service. Length must be the same as the number of shards
+  ## e.g:
+  ## nodePorts:
+  ##   - 30001
+  ##   - 30002
+  ## @param storegateway.sharded.service.grpc.nodePorts Array of grpc node ports used for Store Gateway service. Length must be the same as the number of shards
+  ## e.g:
+  ## nodePorts:
+  ##   - 30011
+  ##   - 30012
+  sharded:
+    enabled: true
+    timePartitioning:
+      # One store for data older than 6 weeks
+      - min: ""
+        max: -6w
+
+      # One store for data newer than 6 weeks and older than 2 weeks
+      - min: -6w
+        max: -2w
+
+      # One store for data newer than 2 weeks
+      - min: -2w
+        max: ""
+  # serviceAccount:
+  #   annotations:
+  #     eks.amazonaws.com/role-arn: arn:aws:iam::xxx:role/ThanosS3Access
+
+
+## remote write 模式下才启用
+# receive:
+#   enabled: true
+#   resources:
+#     limits:
+#       memory: 25Gi
+#     requests:
+#       memory: 25Gi
+#       cpu: 1000m
+#   autoscaling:
+#     enabled: true
+#     minReplicas: 2
+#     maxReplicas: 6
+#     targetCPU: 75
+#     targetMemory: 75
+#   # serviceAccount:
+#   #   annotations:
+#   #     eks.amazonaws.com/role-arn: arn:aws:iam::aws_account_id:role/thanos-receive-sa
