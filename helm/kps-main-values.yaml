@@ -105,7 +105,7 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 50Gi # 联动 retention 的配置，合理设置大小
+              storage: 100Gi # 联动 retention 的配置，合理设置大小
           # storageClassName: "efs" # 动态挂载
           # accessModes: ["ReadWriteMany"]
           # resources:
