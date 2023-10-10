@@ -24,9 +24,9 @@ agent:
           target_label = "service_name"
         }
       }
-      pyroscope.ebpf "instance" {
+      pyroscope.ebpf "local_pods" {
         forward_to = [ pyroscope.write.endpoint.receiver ]
-        targets = discovery.kubernetes.local_pods.targets
+        targets = discovery.relabel.local_pods.output
       }
       pyroscope.write "endpoint" {
         endpoint {
@@ -46,5 +46,5 @@ controller:
 image:
   registry: "docker.io"
   repository: grafana/agent
-  tag: v0.36.1 # v0.36.2
+  tag: v0.36.2 # v0.36.2
 
