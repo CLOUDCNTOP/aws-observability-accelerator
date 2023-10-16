@@ -35,7 +35,7 @@ datasources:
       editable: true
     - name: Thanos
       type: prometheus
-      uid: prometheus
+      uid: thanos
       version: 1
       url: http://thanos-query:9090
       access: proxy
