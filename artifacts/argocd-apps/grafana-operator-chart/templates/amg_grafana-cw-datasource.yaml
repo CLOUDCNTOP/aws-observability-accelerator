@@ -8,18 +8,14 @@ spec:
     matchLabels:
       dashboards: "external-grafana"
   datasource:
-    name: aws-observability-accelerator-cloudwatch
+    name: grafana-operator-cloudwatch-datasource
     type: cloudwatch
     access: server
     isDefault: false
-    url: ""
     jsonData:
       'tlsSkipVerify': false
-      'timeInterval': "5s"
-      "sigV4Auth": true,
-      "sigV4AuthType": "ec2_iam_role"
-      "sigV4Region": ${AMG_AWS_REGION}
-      "customMetricsNamespaces": "ContainerInsights/Prometheus"
-      "defaultRegion": ${AMG_AWS_REGION}
-      "provisionedBy": "aws-datasource-provisioner-app"
+      'authType': "ec2_iam_role"
+      'assumeRoleArn': {{ .Values.CW_ASSUME_ROLE_ARN }}
+      'defaultRegion': {{ .Values.CW_AWS_REGION }}
+      'customMetricsNamespaces': "ContainerInsights/Prometheus"
     editable: true
